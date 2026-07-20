@@ -126,7 +126,7 @@ unlock_target() {
   fi
 
   if [ -d "$target" ]; then
-    chmod 0755 "$target" 2>/dev/null
+    chmod 0771 "$target" 2>/dev/null
     chown "$(stat -c '%u:%g' "$base" 2>/dev/null || echo 0:0)" "$target" 2>/dev/null
     log "Unlocked: $target"
   fi
