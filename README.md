@@ -27,8 +27,9 @@ end
 含义：
 
 - `app`：日志中显示的名称，可以写中文或英文。
-- `enabled 1`：处理该 App。
+- `enabled 1`：锁定该 App 的私有 WebView 目录。
 - `enabled 0`：保留规则但跳过该 App。
+- `enabled 2`：解锁该 App 的目录（恢复为 App 自身权限），用于单独解锁某个 App 而不影响其他。
 - `package`：App 包名，对应 `/data/data/<package>`。
 - `dir`：要锁死的目录，一行一个，只写相对 `/data/data/<package>` 的路径。
 

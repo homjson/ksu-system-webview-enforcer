@@ -114,6 +114,24 @@ clear_cache_dirs() {
   log "Cleared WebView leftovers and cache under $base"
 }
 
+unlock_target() {
+  package="$1"
+  rel="$2"
+  base="/data/data/$package"
+  target="$base/$rel"
+
+  if ! is_safe_relative_path "$rel"; then
+    log "Skip unsafe path: $package | $rel"
+    return
+  fi
+
+  if [ -d "$target" ]; then
+    chmod 0755 "$target" 2>/dev/null
+    chown "$(stat -c '%u:%g' "$base" 2>/dev/null || echo 0:0)" "$target" 2>/dev/null
+    log "Unlocked: $target"
+  fi
+}
+
 process_app() {
   enabled="$1"
   package="$2"
@@ -126,7 +144,7 @@ process_app() {
       ;;
   esac
 
-  if [ "$enabled" != "1" ]; then
+  if [ "$enabled" != "1" ] && [ "$enabled" != "2" ]; then
     log "Skip disabled app: $label ($package)"
     return
   fi
@@ -144,6 +162,18 @@ process_app() {
   fi
 
   owner="$(get_data_owner "$base")"
+
+  if [ "$enabled" = "2" ]; then
+    log "Unlocking $label ($package), data owner $owner"
+    while IFS= read -r rel; do
+      [ -n "$rel" ] || continue
+      unlock_target "$package" "$rel"
+    done <<EOF
+$targets
+EOF
+    return
+  fi
+
   log "Processing $label ($package), data owner $owner"
   changed=0
 
