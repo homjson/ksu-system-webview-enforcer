@@ -1,24 +1,11 @@
 #!/system/bin/sh
 MODDIR=${0%/*}
-CONFIG="$MODDIR/config/apps.conf"
-LOG_DIR="$MODDIR/logs"
-LOG_FILE="$LOG_DIR/uninstall.log"
 
-mkdir -p "$LOG_DIR"
+LOG_FILE="$MODDIR/logs/uninstall.log"
+mkdir -p "$(dirname "$LOG_FILE")"
 : > "$LOG_FILE"
 
-log() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
-}
-
-is_safe_relative_path() {
-  case "$1" in
-    ""|/*|*../*|../*|*"/.."|".")
-      return 1
-      ;;
-  esac
-  return 0
-}
+. "$MODDIR/lib/webview_enforcer.sh"
 
 unlock_target() {
   package="$1"
@@ -38,97 +25,31 @@ unlock_target() {
   fi
 }
 
-reset_app_config() {
-  current_package=""
-  current_targets=""
-}
+# Override library's process_app: unlock instead of block, and process all
+# apps regardless of enabled flag (uninstall should clean up everything).
+process_app() {
+  package="$2"
+  targets="$4"
 
-append_target() {
-  rel="$1"
+  [ -n "$package" ] || return
+  [ -n "$targets" ] || return
 
-  if [ -z "$current_targets" ]; then
-    current_targets="$rel"
-  else
-    current_targets="$current_targets
-$rel"
-  fi
-}
+  base="/data/data/$package"
 
-flush_app_config() {
-  if [ -z "$current_package" ] || [ -z "$current_targets" ]; then
-    reset_app_config
+  if [ ! -d "$base" ]; then
     return
   fi
 
   while IFS= read -r rel; do
     [ -n "$rel" ] || continue
-    unlock_target "$current_package" "$rel"
+    unlock_target "$package" "$rel"
   done <<EOF
-$current_targets
+$targets
 EOF
-
-  reset_app_config
 }
 
-trim_line() {
-  echo "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
-}
-
-parse_config_line() {
-  line="$1"
-
-  case "$line" in
-    ""|\#*)
-      return
-      ;;
-    *"|"*)
-      flush_app_config
-      old_ifs="$IFS"
-      IFS="|"
-      set -- $line
-      IFS="$old_ifs"
-      package="$2"
-      old_targets="$(echo "$4" | sed 's/,/\
-/g')"
-      while IFS= read -r rel; do
-        [ -n "$rel" ] || continue
-        unlock_target "$package" "$rel"
-      done <<EOF
-$old_targets
-EOF
-      return
-      ;;
-  esac
-
-  key="${line%%[[:space:]]*}"
-  value="$(echo "$line" | sed 's/^[^[:space:]]*[[:space:]]*//')"
-
-  case "$key" in
-    app)
-      flush_app_config
-      reset_app_config
-      ;;
-    package)
-      current_package="$value"
-      ;;
-    dir)
-      append_target "$value"
-      ;;
-    end)
-      flush_app_config
-      ;;
-  esac
-}
-
-if [ -f "$CONFIG" ]; then
-  reset_app_config
-
-  while IFS= read -r raw_line || [ -n "$raw_line" ]; do
-    line="$(trim_line "$raw_line")"
-    parse_config_line "$line"
-  done < "$CONFIG"
-
-  flush_app_config
+if [ -f "$APPS_CONF" ]; then
+  parse_apps_config
 fi
 
 log "Uninstall cleanup finished."
