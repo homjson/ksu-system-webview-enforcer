@@ -4,7 +4,7 @@
 
 ## 安装
 
-1. 在 KernelSU Manager 中刷入 `ksu-system-webview-enforcer-v1.1.0.zip`。
+1. 从 [Releases](https://github.com/homjson/ksu-system-webview-enforcer/releases) 页面下载最新版本的 zip 包。
 2. 重启手机。
 3. 进入模块页面，点击本模块的 Action 按钮执行一次。
 4. Action 页面会显示最后 40 行日志；完整日志位于模块目录的 `logs/manual.log`。
