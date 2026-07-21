@@ -35,6 +35,8 @@ end
 
 新增 App 时复制一整段；新增目录时只加一行 `dir ...`；禁用某个 App 时把 `enabled 1` 改成 `enabled 0`。
 
+**升级模块时，`apps.conf` 和 `settings.conf` 会被自动保留，不会覆盖你修改过的配置。**
+
 脚本仍兼容旧版 `enabled|package|label|dir,dir` 格式，但不再推荐手写旧格式。
 
 默认启用：
