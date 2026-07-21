@@ -11,6 +11,9 @@
 
 KernelSU 官方文档说明模块安装包是可由 KernelSU Manager 刷入的 zip；模块目录至少需要 `module.prop`，脚本可使用 `action.sh`、`boot-completed.sh`、`uninstall.sh` 等文件。
 
+## 更新
+更新模块不会覆盖apps.conf里的配置，如需要更新模块的apps.conf，删除本地的apps.conf。
+
 ## 配置
 
 `config/apps.conf` 使用分段格式。每个 App 从 `app` 开始，到 `end` 结束：
