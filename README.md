@@ -1,15 +1,15 @@
-# System WebView Enforcer for KernelSU
+# System WebView Enforcer
 
-这个 KernelSU 模块根据《优化 App 流畅度教程》的思路，将选中 App 的私有 WebView 内核目录删除后替换成 `root:root`、权限 `000` 的空目录，迫使 App 回退到 Android System WebView。
+根据《优化 App 流畅度教程》的思路，将选中 App 的私有 WebView 内核目录删除后替换成 `root:root`、权限 `000` 的空目录，迫使 App 回退到 Android System WebView。
+
+支持 **KernelSU** 和 **Magisk** 两种框架。
 
 ## 安装
 
 1. 从 [Releases](https://github.com/homjson/ksu-system-webview-enforcer/releases) 页面下载最新版本的 zip 包。
 2. 重启手机。
-3. 进入模块页面，点击本模块的 Action 按钮执行一次。
+3. 打开管理器 App（KernelSU Manager 或 Magisk App），进入模块页面，点击本模块的 **Action 按钮**执行一次。
 4. Action 页面会显示最后 40 行日志；完整日志位于模块目录的 `logs/manual.log`。
-
-KernelSU 官方文档说明模块安装包是可由 KernelSU Manager 刷入的 zip；模块目录至少需要 `module.prop`，脚本可使用 `action.sh`、`boot-completed.sh`、`uninstall.sh` 等文件。
 
 ## 更新
 更新模块不会覆盖apps.conf里的配置，如需要更新模块的apps.conf，删除本地的apps.conf。
@@ -49,15 +49,17 @@ end
 - 淘宝
 - 闲鱼
 - 铁路 12306
+- QQ
+- 支付宝
+- 天猫
 
 默认禁用：
 
 - 百度地图
-- QQ
 - QQ 音乐
-- 支付宝 Play 版
 - 钉钉
 - 微信
+- 抖音
 
 这些默认禁用项通常涉及更复杂的安全、风控或业务逻辑，建议确认能接受崩溃、功能异常、账号风控提示等风险后再启用。
 
@@ -65,17 +67,16 @@ end
 
 ## 开机自动补锁
 
-默认不开启开机自动执行。需要时修改：
+默认不开启开机自动执行。需要时在 `config/settings.conf` 中设置 `AUTO_RUN_ON_BOOT=1`：
 
 ```sh
 AUTO_RUN_ON_BOOT=1
 ```
 
-文件位置：
+- **KernelSU**：使用 `boot-completed.sh`
+- **Magisk**：使用 `service.sh`（late_start service 阶段）
 
-```text
-/data/adb/modules/ksu_system_webview_enforcer/config/settings.conf
-```
+两者互不冲突，zip 包同时包含两个脚本，在各自框架下自动生效。
 
 ## 回滚
 
