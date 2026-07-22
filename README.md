@@ -1,6 +1,6 @@
 # System WebView Enforcer
 
-根据《优化 App 流畅度教程》的思路，将选中 App 的私有 WebView 内核目录删除后替换成 `root:root`、权限 `000` 的空目录，迫使 App 回退到 Android System WebView。
+根据酷安贴《强制第三方 APP 调用 Android system webview 运行教程 》的思路，将选中 App 的私有 WebView 内核目录删除后替换成 `root:root`、权限 `000` 的空目录，迫使 App 回退到 Android System WebView。
 
 支持 **KernelSU** 和 **Magisk** 两种框架。
 
